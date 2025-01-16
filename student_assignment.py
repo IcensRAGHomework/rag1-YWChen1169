@@ -6,11 +6,67 @@ from model_configurations import get_model_configuration
 from langchain_openai import AzureChatOpenAI
 from langchain_core.messages import HumanMessage
 
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, FewShotChatMessagePromptTemplate
+
 gpt_chat_version = 'gpt-4o'
 gpt_config = get_model_configuration(gpt_chat_version)
 
 def generate_hw01(question):
-    pass
+    llm = AzureChatOpenAI(
+            model=gpt_config['model_name'],
+            deployment_name=gpt_config['deployment_name'],
+            openai_api_key=gpt_config['api_key'],
+            openai_api_version=gpt_config['api_version'],
+            azure_endpoint=gpt_config['api_base'],
+            temperature=gpt_config['temperature']
+    )
+
+    examples = [
+        {
+        "input":"2024年台灣10月紀念日有哪些?",
+        "output":
+        """{
+                "Result": [
+                    {
+                        "date": "2024-10-10",
+                        "name": "國慶日"
+                    },
+                    {
+                        "date": "2024-10-11",
+                        "name": "重陽節"
+                    }
+                ]
+            }"""
+        },
+    ]
+
+    example_prompt = ChatPromptTemplate.from_messages(
+        [
+        ("human", "{input}"),
+        ("ai", "{output}"),
+        ]
+        )
+    few_shot_promt = FewShotChatMessagePromptTemplate(
+            example_prompt=example_prompt,
+            examples=examples,
+        )
+
+    final_prompt = ChatPromptTemplate.from_messages(
+            [
+            ("system","You are an assistant that provides structured answers to user queries. "
+            "Below is the input query and the intermediate steps you have taken. and the result is the json output\n"),
+            few_shot_promt,
+            ("human", "{input}"),
+            ]
+        )
+
+    chain = final_prompt | llm
+
+    response = chain.invoke({"input": question })
+
+
+
+    return response.content  
     
 def generate_hw02(question):
     pass
@@ -38,3 +94,6 @@ def demo(question):
     response = llm.invoke([message])
     
     return response
+
+
+print(generate_hw01('2024年台灣10月紀念日有哪些?'))
