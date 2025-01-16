@@ -5,7 +5,8 @@ from model_configurations import get_model_configuration
 
 from langchain_openai import AzureChatOpenAI
 from langchain_core.messages import HumanMessage
-
+from pydantic import BaseModel, Field
+from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, FewShotChatMessagePromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.agents import tool, create_openai_functions_agent, AgentExecutor
 from langchain.chains import LLMChain
