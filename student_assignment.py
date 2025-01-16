@@ -9,8 +9,6 @@ from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, FewShotChatMessagePromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.agents import tool, create_openai_functions_agent, AgentExecutor
 from langchain.chains import LLMChain
-
-
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -18,7 +16,6 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 
 import base64
 
-import calendarific
 
 gpt_chat_version = 'gpt-4o'
 gpt_config = get_model_configuration(gpt_chat_version)
