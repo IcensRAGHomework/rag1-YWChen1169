@@ -79,7 +79,122 @@ def generate_hw01(question):
     return response.content  
     
 def generate_hw02(question):
-    pass
+    # define the tool
+    @tool
+    def check_calendarific(country : str, year : str, month : str) -> dict:
+        """  use the calendarific api to check all the holiday with the str parameter country, year, month. 
+            year and month is string
+        """
+        api_key = 'WjJ5eItS7tMLp9x0c1SS1x7HxaGSTq9t'
+        url = 'https://calendarific.com/api/v2/holidays?&api_key={api_key}&country={country}&year={year}&month={month}'
+
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
+            data = response.json()  # Parse JSON response into a dictionary
+
+            holidays = data.get('response', {}).get('holidays', [])
+            output_data = {
+                "Result": [
+                {
+                    "date": holiday['date']['iso'],
+                    "name": holiday['name']
+                }
+                for holiday in holidays['response']['holidays']
+            ]
+            }
+
+            return output_data
+        except requests.exceptions.HTTPError as http_err:
+            print(f'HTTP error occurred: {http_err}')
+        except requests.exceptions.RequestException as req_err:
+            print(f'Request error occurred: {req_err}')
+        except json.JSONDecodeError as json_err:
+            print(f'Error decoding JSON: {json_err}')
+        except Exception as err:
+            print(f'An error occurred: {err}')
+
+    return {"Result": []}  # Return an empty result in case of error
+    tools = [check_calendarific]
+
+    llm = AzureChatOpenAI(
+            model=gpt_config['model_name'],
+            deployment_name=gpt_config['deployment_name'],
+            openai_api_key=gpt_config['api_key'],
+            openai_api_version=gpt_config['api_version'],
+            azure_endpoint=gpt_config['api_base'],
+            temperature=gpt_config['temperature']
+    )
+
+
+    message = HumanMessage(
+            content=[
+                {"type": "text", "text": question},
+            ]
+    )
+
+    examples = [
+        {
+        "input":"2024年台灣10月紀念日有哪些?",
+        "output":
+        """
+        {
+            "Result": [
+                {
+                    "date": "2024-10-10",
+                    "name": "National Day"
+                },
+                {
+                    "date": "2024-10-09",
+                    "name": "Double Ninth Day"
+                },
+                {
+                    "date": "2024-10-21",
+                    "name": "Overseas Chinese Day"
+                },
+                {
+                    "date": "2024-10-25",
+                    "name": "Taiwan's Retrocession Day"
+                },
+                {
+                    "date": "2024-10-31",
+                    "name": "Halloween"
+                }
+            ]
+        }
+        """
+        },
+    ]
+
+    example_prompt = ChatPromptTemplate.from_messages(
+            [
+            ("human", "{input}"),
+            ("ai", "{output}"),
+            ]
+        )
+    few_shot_promt = FewShotChatMessagePromptTemplate(
+            example_prompt=example_prompt,
+            examples=examples,
+        )
+
+    final_prompt = ChatPromptTemplate.from_messages(
+            [
+            ("system","You are an assistant."
+            "Below is the input query and the intermediate steps you have taken."
+            "the output data sturctured was like the examples, provide the json data structure"),
+            few_shot_promt,
+            ("human", "{input}"),
+            ("ai" , "{agent_scratchpad}"),
+            ]
+        )
+
+    agent = create_openai_functions_agent(llm = llm, tools = tools, prompt = final_prompt)
+    agent_excutor = AgentExecutor(agent = agent, tools = tools, verbose = True)
+    response = agent_excutor.invoke({"input" : message,"agent_scratchpad" : ""})
+
+
+    return response["output"].strip('```json\n').strip('```')
+
     
 def generate_hw03(question2, question3):
     pass
@@ -101,7 +216,7 @@ def generate_hw04(question):
         score : int = Field(description="填入數字")
 
     class JsonOutput(BaseModel):
-        Resule : ImageInformation
+        Result : ImageInformation
 
     parser = JsonOutputParser(pydantic_object=JsonOutput)
 
