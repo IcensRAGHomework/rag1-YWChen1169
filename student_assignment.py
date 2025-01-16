@@ -189,58 +189,9 @@ def generate_hw02(question):
     
 def generate_hw03(question2, question3):
     pass
-    
+
 def generate_hw04(question):
-
-    llm = AzureChatOpenAI(
-            model=gpt_config['model_name'],
-            deployment_name=gpt_config['deployment_name'],
-            openai_api_key=gpt_config['api_key'],
-            openai_api_version=gpt_config['api_version'],
-            azure_endpoint=gpt_config['api_base'],
-            temperature=gpt_config['temperature']
-    )
-
-
-
-    class ImageInformation(BaseModel):
-        score : int = Field(description="填入數字")
-
-    class JsonOutput(BaseModel):
-        Resule : ImageInformation
-
-    parser = JsonOutputParser(pydantic_object=JsonOutput)
-
-    # encode image
-    base64_image = base64.b64encode(open("./baseball.png", 'rb').read()).decode('utf-8')
-
-
-    message = HumanMessage(
-            content=[
-                {"type": "text", "text": question},
-                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-            ]
-    )
-
-    system_prompt = SystemMessagePromptTemplate(
-        prompt=PromptTemplate(input_variables=[], 
-            template=
-            """
-            You are a helpful assistant,  provide the response in JSON format. "
-            the data structure 
-            """)
-    )
-
-    prompt_template = PromptTemplate(
-        template="請解析以下問題並只以 JSON 格式返回結果：{format_instructions}",
-        partial_variables={"format_instructions": parser.get_format_instructions()}
-    )
-
-    chain = llm
-
-    response = chain.invoke([prompt_template.format(),message]).content
-    return response.strip('```json\n').strip('```')
-    
+    pass
 def demo(question):
     llm = AzureChatOpenAI(
             model=gpt_config['model_name'],
