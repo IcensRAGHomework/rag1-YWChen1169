@@ -234,7 +234,7 @@ def generate_hw03(question2, question3):
     def organize_the_answer(add : bool, reason : str ) -> dict:
         """
         after answer the question : Based on the previous holiday lists, the holidays on the list for that mont?. and use this tool to organize the answer.
-        add : If the answer is  included in the list of holidays then return true ,  otherwise, it returns false.
+        add : If the date is  included in the list of holidays date then return false ,  otherwise, it returns true.
         reason : Describe why you do or do not want to add a new holiday, specify whether the holiday already exists in the list, and the contents of the current list.
         """
         output_data = {
@@ -259,51 +259,6 @@ def generate_hw03(question2, question3):
             temperature=gpt_config['temperature'],
             # model_kwargs={ "response_format": { "type": "json_object" } }
     )
-
-
-    examples = [
-        {
-        "input":"2024年台灣10月紀念日有哪些?",
-        "output":
-        """
-        {
-                "Result": [
-                    {
-                        "date": "2024-10-10",
-                        "name": "National Day"
-                    },
-                    {
-                        "date": "2024-10-09",
-                        "name": "Double Ninth Day"
-                    },
-                    {
-                        "date": "2024-10-21",
-                        "name": "Overseas Chinese Day"
-                    },
-                    {
-                        "date": "2024-10-25",
-                        "name": "Taiwan's Retrocession Day"
-                    },
-                    {
-                        "date": "2024-10-31",
-                        "name": "Halloween"
-                    }
-                ]
-            }
-            """
-        },
-    ]
-
-    example_prompt = ChatPromptTemplate.from_messages(
-            [
-            ("human", "{input}"),
-            ("ai", "{output}"),
-            ]
-        )
-    few_shot_promt = FewShotChatMessagePromptTemplate(
-            example_prompt=example_prompt,
-            examples=examples,
-        )
 
     # Define the templates
     system_prompt = SystemMessagePromptTemplate(
@@ -438,4 +393,4 @@ def demo(question):
     return response
 
 
-print(generate_hw03('2024年台灣10月紀念日有哪些?','根據先前的節日清單，這個節日{"date": "10-31", "name": "Halloween"}是否有在該月份清單？'))
+print(generate_hw03('2024年台灣10月紀念日有哪些?','根據先前的節日清單，這個節日是否有在該月份清單？{"date": "10-31", "name": "蔣公誕辰紀念日"}'))
