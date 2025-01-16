@@ -86,7 +86,7 @@ def generate_hw02(question):
             year and month is string
         """
         api_key = 'WjJ5eItS7tMLp9x0c1SS1x7HxaGSTq9t'
-        url = 'https://calendarific.com/api/v2/holidays?&api_key={api_key}&country={country}&year={year}&month={month}'
+        url = f'https://calendarific.com/api/v2/holidays?&api_key={api_key}&country={country}&year={year}&month={month}'
 
         try:
             response = requests.get(url)
@@ -187,7 +187,7 @@ def generate_hw02(question):
         )
 
     agent = create_openai_functions_agent(llm = llm, tools = tools, prompt = final_prompt)
-    agent_excutor = AgentExecutor(agent = agent, tools = tools, verbose = True)
+    agent_excutor = AgentExecutor(agent = agent, tools = tools, verbose = False)
     response = agent_excutor.invoke({"input" : message,"agent_scratchpad" : ""})
 
 
@@ -330,7 +330,7 @@ def generate_hw03(question2, question3):
 
 
     agent = create_openai_functions_agent(llm = llm, tools = tools, prompt = final_prompt)
-    agent_executor = AgentExecutor(agent = agent, tools = tools, verbose = True)
+    agent_executor = AgentExecutor(agent = agent, tools = tools, verbose = False)
 
     #Adding in memory
     store = {}
@@ -438,4 +438,4 @@ def demo(question):
     return response
 
 
-print(generate_hw01('2024年台灣10月紀念日有哪些?'))
+print(generate_hw03('2024年台灣10月紀念日有哪些?','根據先前的節日清單，這個節日{"date": "10-31", "name": "Halloween"}是否有在該月份清單？'))
